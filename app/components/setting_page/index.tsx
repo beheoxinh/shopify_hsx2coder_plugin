@@ -6,53 +6,57 @@ import { Button, ButtonGroup, Text, Page, Card, Icon, Checkbox, FormLayout, Sele
 interface State {
 	tab_index: number;
 	focused: boolean;
-	saveStatus: boolean;
-	dataSource: any
+	dataSource: any;
+	originData: any;
+	validError: {errCode: string, message: string}[];
 }
 
 export class SettingPage extends Component<{}, State> {
+
 	constructor(props: {}) {
 		super(props);
-
+		const data = {
+			isShowCalender: false,
+			isReqDelivery: false,
+			isAlwaysOpenCalendar: false,
+			layout: '',
+			calenderLayout: 'calender',
+			themeColor: {
+				hue: 300,
+				brightness: 1,
+				saturation: 0.7,
+				alpha: 0.7,
+			},
+			titleColor: {
+				hue: 200,
+				brightness: 1,
+				saturation: 0.5,
+				alpha: 0.3,
+			},
+			messageColor: {
+				hue: 0,
+				brightness: 0,
+				saturation: 0.0,
+				alpha: 0.0,
+			},
+			deliveryDate: {
+				title: '',
+				deliveryDateLabel: '',
+				deliveryDateTitle: '',
+				deliveryTimeTitle: '',
+				requiredMessageText: ''
+			}
+		}
 		this.state = {
 			tab_index: 0,
 			focused: true,
-			saveStatus: false,
-			dataSource: {
-				isShowCalender: false,
-				isReqDelivery: false,
-				isAlwaysOpenCalendar: false,
-				layout: '',
-				calenderLayout: 'calender',
-				themeColor: {
-					hue: 300,
-					brightness: 1,
-					saturation: 0.7,
-					alpha: 0.7,
-				},
-				titleColor: {
-					hue: 200,
-					brightness: 1,
-					saturation: 0.5,
-					alpha: 0.3,
-				},
-				messageColor: {
-					hue: 0,
-					brightness: 0,
-					saturation: 0.0,
-					alpha: 0.0,
-				},
-				deliveryDate: {
-					title: '',
-					deliveryDateLabel: '',
-					deliveryDateTitle: '',
-					deliveryTimeTitle: '',
-					requiredMessageText: ''
-				}
-			}
+			dataSource: data,
+			originData: data,
+			validError: []
 		};
 	}
 
+	//Define client data
 	layoutOptions = [
 		{label: 'Default', value: ''},
 		{label: 'Dark Mode', value: 'dark'},
@@ -95,6 +99,7 @@ export class SettingPage extends Component<{}, State> {
 		},
 	];
 
+	//Fallback function React class model
 	componentDidMount() {
 		this.handleToggleClass = this.handleToggleClass.bind(this);
 		const rightControls = document.querySelectorAll('.right-control');
@@ -115,93 +120,138 @@ export class SettingPage extends Component<{}, State> {
 		container.classList.toggle('closed');
 	}
 
+	//Handle data emmmit
+	handleSaveButton = () => {
+		//Validate user input data
+		let errors = [];
+		if (!this.state.dataSource.deliveryDate?.title?.length) {
+			errors.push({errCode: '001', message: 'Giá trị Title không được để trống'});
+		}
+		if (!this.state.dataSource.deliveryDate?.deliveryDateLabel?.length) {
+			errors.push({errCode: '002', message: 'Giá trị Date Label không được để trống'});
+		}
+		if (!this.state.dataSource.deliveryDate?.deliveryDateTitle?.length) {
+			errors.push({errCode: '003', message: 'Giá trị Date Title không được để trống'});
+		}
+		if (!this.state.dataSource.deliveryDate?.deliveryTimeTitle?.length) {
+			errors.push({errCode: '004', message: 'Giá trị Time Title không được để trống'});
+		}
+		if (!this.state.dataSource.deliveryDate?.requiredMessageText?.length) {
+			errors.push({errCode: '005', message: 'Giá trị Required Message Text không được để trống'});
+		}
+		this.setState({validError: errors}); // Set validError state with errors array
+
+		if (errors.length > 0) return errors;
+
+		//Commit data to storage / endpoint
+		console.log('Saved Data:', this.state.dataSource);  
+		//Client fontend sync update status callback
+		this.setState(prevState => ({
+			originData: prevState.dataSource
+		}));
+
+	}
+	
+	//Functional action
+	isFormChangeState() {
+		return JSON.stringify(this.state?.originData) != JSON.stringify(this.state?.dataSource);
+	}
+
 	displayComponentTab = () => {
 		const index = this.state.tab_index ?? 0;
 		switch ( index ) {
 			case undefined :
 			case 0:
 				return (<React.Fragment>
-					<div className="card-content-container">
-						<div className="row-panel-warp top-5">
-							<TextField
-								label="Tile"
-								autoComplete="off"
-								value={this.state.dataSource.deliveryDate.title}
-								onChange={(value) => {
-									this.setState(prevState => ({
-										dataSource: {
-											...prevState.dataSource, deliveryDate: {
-												...prevState.dataSource.deliveryDate,
-												title: value
-											}}
-									}));
-								}}
-							/>
-						</div>
-						<div className="row-panel-warp top-10">
-							<TextField
-								label="Delivery date label"
-								autoComplete="off"
-								value={this.state.dataSource.deliveryDate.deliveryDateLabel}
-								onChange={(value) => {
-									this.setState(prevState => ({
-										dataSource: {
-											...prevState.dataSource, deliveryDate: {
-												...prevState.dataSource.deliveryDate,
-												deliveryDateLabel: value
-											}}
-									}));
-								}}
-							/>
-						</div>
-						<div className="row-panel-warp top-10">
-							<TextField
-								label="Delivery date title"
-								autoComplete="off"
-								value={this.state.dataSource.deliveryDate.deliveryDateTitle}
-								onChange={(value) => {
-									this.setState(prevState => ({
-										dataSource: {
-											...prevState.dataSource, deliveryDate: {
-												...prevState.dataSource.deliveryDate,
-												deliveryDateTitle: value
-											}}
-									}));
-								}}
-							/>
-						</div>
-						<div className="row-panel-warp top-10">
-							<TextField
-								label="Delivery time title"
-								autoComplete="off"
-								value={this.state.dataSource.deliveryDate.deliveryTimeTitle}
-								onChange={(value) => {
-									this.setState(prevState => ({
-										dataSource: {
-											...prevState.dataSource, deliveryDate: {
-												...prevState.dataSource.deliveryDate,
-												deliveryTimeTitle: value
-											}}
-									}));
-								}}
-							/>
-						</div>
-						<div className="row-panel-warp">
-							<TextField
-								label="Required message text"
-								autoComplete="off"
-								value={this.state.dataSource.deliveryDate.requiredMessageText}
-								onChange={(value) => {
-									this.setState(prevState => ({
-										dataSource: {
-											...prevState.dataSource, deliveryDate: {
-												...prevState.dataSource.deliveryDate,
-												requiredMessageText: value
-											}}
-									}));
-								}}
-							/>
-						</div>
+					<div className="row-panel-warp top-5">
+						<TextField
+							label="Tile"
+							autoComplete="off"
+							value={this.state.dataSource.deliveryDate.title}
+							error={this.state.validError.filter(el => el.errCode == '001')[0]?.message}
+							onChange={(value) => {
+								this.setState(prevState => ({
+									dataSource: {
+										...prevState.dataSource, deliveryDate: {
+											...prevState.dataSource.deliveryDate,
+											title: value
+										}
+									}
+								}));
+							}}
+						/>
+					</div>
+					<div className="row-panel-warp top-10">
+						<TextField
+							label="Delivery date label"
+							autoComplete="off"
+							value={this.state.dataSource.deliveryDate.deliveryDateLabel}
+							error={this.state.validError.filter(el => el.errCode == '002')[0]?.message}
+							onChange={(value) => {
+								this.setState(prevState => ({
+									dataSource: {
+										...prevState.dataSource, deliveryDate: {
+											...prevState.dataSource.deliveryDate,
+											deliveryDateLabel: value
+										}
+									}
+								}));
+							}}
+						/>
+					</div>
+					<div className="row-panel-warp top-10">
+						<TextField
+							label="Delivery date title"
+							autoComplete="off"
+							value={this.state.dataSource.deliveryDate.deliveryDateTitle}
+							error={this.state.validError.filter(el => el.errCode == '003')[0]?.message}
+							onChange={(value) => {
+								this.setState(prevState => ({
+									dataSource: {
+										...prevState.dataSource, deliveryDate: {
+											...prevState.dataSource.deliveryDate,
+											deliveryDateTitle: value
+										}
+									}
+								}));
+							}}
+						/>
+					</div>
+					<div className="row-panel-warp top-10">
+						<TextField
+							label="Delivery time title"
+							autoComplete="off"
+							value={this.state.dataSource.deliveryDate.deliveryTimeTitle}
+							error={this.state.validError.filter(el => el.errCode == '004')[0]?.message}
+							onChange={(value) => {
+								this.setState(prevState => ({
+									dataSource: {
+										...prevState.dataSource, deliveryDate: {
+											...prevState.dataSource.deliveryDate,
+											deliveryTimeTitle: value
+										}
+									}
+								}));
+							}}
+						/>
+					</div>
+					<div className="row-panel-warp">
+						<TextField
+							label="Required message text"
+							autoComplete="off"
+							value={this.state.dataSource.deliveryDate.requiredMessageText}
+							error={this.state.validError.filter(el => el.errCode == '005')[0]?.message}
+							onChange={(value) => {
+								this.setState(prevState => ({
+									dataSource: {
+										...prevState.dataSource, deliveryDate: {
+											...prevState.dataSource.deliveryDate,
+											requiredMessageText: value
+										}
+									}
+								}));
+							}}
+						/>
 					</div>
 				</React.Fragment>)
 			case 1 :
@@ -215,15 +265,15 @@ export class SettingPage extends Component<{}, State> {
 		return (
 			<Page>
 				<div className={'page-header'}>
-					<h3>{this.state.saveStatus ? 'Saved' : 'Unsaved'}</h3>
+					<h3>{this.isFormChangeState() && 'Unsaved changes'}</h3>
 					<div className={'right-controller'}>
 						<ButtonGroup>
 							<Button variant="primary" size="large" onClick={() => {
-								this.setState({saveStatus: false})
+								this.setState(prevState => ({
+									dataSource: prevState.originData
+								}));
 							}}>Discard</Button>
-							<Button id={'save-button'} variant="primary" size="large" onClick={() => {
-								this.setState({saveStatus: true})
-							}}>Save</Button>
+							{this.isFormChangeState() && <Button id={'save-button'} variant="primary" size="large" onClick={this.handleSaveButton}>Save</Button>}
 						</ButtonGroup>
 					</div>
 				</div>
@@ -478,13 +528,16 @@ export class SettingPage extends Component<{}, State> {
 										</span>
 									</div>
 								</div>
-								<Tabs tabs={this.tabs} selected={this.state.tab_index} onSelect={(selected) => {
+
+								<div className="card-content-container">
+									<Tabs tabs={this.tabs} selected={this.state.tab_index} onSelect={(selected) => {
 										this.setState(prevState => ({...prevState, tab_index: selected}));
 									}} fitted>
-                                        <LegacyCard.Section>
+										<LegacyCard.Section>
 											{this.displayComponentTab()}
-                                        </LegacyCard.Section>
-                                    </Tabs>
+										</LegacyCard.Section>
+									</Tabs>
+								</div>
 							</Card>
 						</div>
 					</div>
