@@ -1,0 +1,159 @@
+.page-header {
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #000;
+
+    h3 {
+        color: #fff;
+        font-weight: 400;
+        font-family: sans-serif;
+    }
+
+    .right-controller {
+        button {
+            color: #80878A;
+            font-weight: 600;
+            box-shadow: none;
+            background-color: #000;
+            border: 1px solid #80878A;
+            border-radius: 3px;
+        }
+
+        button#save-button {
+            color: #fff;
+            background-color: #216ED7;
+        }
+
+        button:hover {
+            box-shadow: none;
+            border: 1px solid #fff;
+        }
+    }
+}
+
+
+.row-panel-warp.wd-50 {
+    display: inline-block;
+    width: 47%;
+    margin: 0 2% 0 0;
+}
+
+.page-wrapper {
+    width: 92%;
+    margin: 0 auto;
+
+    .page-title {
+        margin: 5px 0 10px;
+    }
+
+    .page-content {
+        margin-top: 10px;
+
+        .card-panel-container {
+            padding: 0 0 10px 0;
+            .up-nav{
+                display: block;
+            }
+            .down-nav{
+                display: none;
+            }
+        }
+
+        .card-panel-container.closed{
+            .up-nav{
+                display: none;
+            }
+            .down-nav{
+                display: block;
+            }
+            .card-content-container{
+                display: none;
+            }
+        }
+
+        .card-title-container {
+            width: 100%;
+            display: flex;
+            position: relative;
+            top: -5px;
+            justify-content: space-between;
+
+            .Polaris-Icon {
+                width: 1.5rem;
+                height: 1.5rem;
+                display: inline-block;
+                position: relative;
+                top: 7px;
+                left: -2px;
+            }
+
+            .left-side {
+                font-weight: 800;
+            }
+
+            .right-control {
+                cursor: pointer;
+            }
+        }
+
+        .card-title-container.red-colored {
+            .Polaris-Icon, span, p {
+                color: red;
+            }
+
+        }
+
+        .card-content-container {
+            .Polaris-FormLayout__Item {
+                flex: 1 1;
+            }
+        }
+    }
+}
+
+.row-panel-warp {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 0;
+
+    .color-lineout {
+        position: absolute;
+        top:0;
+        right: 0;
+        margin-right: -0.75rem;
+        display: block;
+        width: 34px;
+        height: 33px;
+        border-radius: 6px 8px 8px 6px;
+        border: 1px solid #8F9497;
+        border-left: none;
+        box-shadow: none;
+        cursor: pointer;
+    }
+}
+
+.color-warp-input {
+    input {
+        outline: none;
+    }
+    .Polaris-TextField{
+        position: relative;
+    }
+    .Polaris-TextField__Suffix{
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+}
+
+.top-5{
+    margin-top:5px;
+}
+
+.top-10{
+    margin-top:10px;
+}
